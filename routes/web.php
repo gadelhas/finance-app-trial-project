@@ -18,7 +18,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect()->route('transactions.index');
 })->middleware(['auth'])->name('dashboard');
 
 Route::resource('transactions', \App\Http\Controllers\TransactionsController::class)
