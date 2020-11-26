@@ -22,6 +22,10 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 Route::resource('transactions', \App\Http\Controllers\TransactionsController::class)
+    ->only(['index', 'store', 'update'])
+    ->middleware(['auth']);
+Route::get('balance', [\App\Http\Controllers\BalanceController::class, 'index'])
+    ->name('balance.index')
     ->middleware(['auth']);
 
 require __DIR__ . '/auth.php';

@@ -1,6 +1,7 @@
 require('./bootstrap');
 
 import Vue from 'vue';
+import store from './store';
 
 import BalanceComponent from './components/transactions/Balance.vue'
 import ItemComponent from './components/transactions/Item.vue'
@@ -12,8 +13,12 @@ Vue.component('Group', ItemsGroupComponent);
 
 const app = new Vue({
     el: '#app',
-    data: {
-        balance: 0.00,
-    },
+    store,
+    created() {
+        store.dispatch('getBalance');
+    }
 
 });
+
+global.Vue = Vue;
+global.app = app;

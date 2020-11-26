@@ -9,6 +9,11 @@ class Transaction extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'label',
+        'amount',
+        'date',
+    ];
 
     public function user()
     {
