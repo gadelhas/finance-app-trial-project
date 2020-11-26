@@ -17,7 +17,7 @@ class CreateTransactionsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('label');
-            $table->date('date');
+            $table->dateTime('date');
             $table->decimal('amount', 10, 2);
             $table->timestamps();
 
