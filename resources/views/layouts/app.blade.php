@@ -47,11 +47,11 @@
 
                 <div class="flex flex-row">
                     <a href="#"
-                       class="flex items-center mr-4 px-3 py-2 bg-blue-700 rounded-md text-white text-xs font-bold uppercase tracking-tight">
+                       class="flex items-center mr-4 px-3 py-2 bg-blue-700 rounded-md text-white text-xs font-bold uppercase tracking-tight" @click="showInsertModal">
                         Add Entry
                     </a>
                     <a href="#"
-                       class="flex items-center mr-4 px-3 py-2 bg-blue-700 rounded-md text-white text-xs font-bold uppercase tracking-tight">
+                       class="flex items-center mr-4 px-3 py-2 bg-blue-700 rounded-md text-white text-xs font-bold uppercase tracking-tight" @click="showInsertCsvModal">
                         Import CSV
                     </a>
                 </div>
@@ -66,7 +66,11 @@
             <Group date="{{ $date }}" :transactions="{{ json_encode($transaction) }}"></Group>
         @endforeach
     </div>
+
+    <insert-modal v-show="isInsertModalVisible" @close="closeInsertModal" ref="insertModal"></insert-modal>
+    <insert-csv-modal v-show="isInsertCsvModalVisible" @close="closeInsertCsvModal" ref="insertCsvModal"></insert-csv-modal>
 </div>
+
 
 <!-- Scripts -->
 <script src="{{ mix('js/app.js') }}" defer></script>

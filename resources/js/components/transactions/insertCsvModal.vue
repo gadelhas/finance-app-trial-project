@@ -1,6 +1,6 @@
 <template>
     <!-- This example requires Tailwind CSS v2.0+ -->
-    <div class="fixed z-10 inset-0 overflow-y-auto insertModal" id="insertModal">
+    <div class="fixed z-10 inset-0 overflow-y-auto insertCsvModal" id="insertCsvModal">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <!--
               Background overlay, show/hide based on modal state.
@@ -33,33 +33,15 @@
                     <div class="sm:flex sm:items-start">
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                             <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                                Add Balance Entry
+                                Import Balance Entries
                             </h3>
 
                             <div class="inputs px-4 my-10">
-                                <div class="grid grid-cols-3">
-                                    <div class="px-4">
-                                        <label for="label"
-                                               class="block text-sm font-medium text-gray-700 uppercase">Label</label>
-                                        <input type="text" id="label" name="label" class="form-input rounded-md shadow-sm w-full">
-                                    </div>
-                                    <div class="px-4">
-                                        <label for="date"
-                                               class="block text-sm font-medium text-gray-700 uppercase">Date</label>
-                                        <input type="text" id="date" name="date" class="form-input rounded-md shadow-sm w-full">
-                                    </div>
-                                    <div class="px-4">
-                                        <label for="amount"
-                                               class="block text-sm font-medium text-gray-700 uppercase">Amount</label>
-                                        <div class="relative rounded-md shadow-sm">
-                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                              <span class="text-gray-500 sm:text-sm">
-                                                $
-                                              </span>
-                                            </div>
-                                            <input type="text" id="amount" name="amount"
-                                                   class="form-input rounded-md shadow-sm w-full pl-7 pr-12">
-                                        </div>
+                                <div class="grid grid-cols-1">
+                                    <div class="">
+                                        <label for="file"
+                                               class="block text-sm font-medium text-gray-700 uppercase">CSV File</label>
+                                        <input type="file" id="file" name="file" class="form-input rounded-md shadow-sm w-full">
                                     </div>
                                 </div>
                             </div>
@@ -82,7 +64,7 @@
 
 <script>
 export default {
-    name: 'insert-modal',
+    name: 'insert-csv-modal',
     methods: {
         open() {
             console.log("OPENING IN COMPOENNT");
@@ -95,13 +77,14 @@ export default {
             e.preventDefault();
 
             console.log("updateTransaction");
-            let editorEl = document.getElementById("insertModal");
-            let label = editorEl.querySelector('#label').value;
-            let date = editorEl.querySelector('#date').value;
-            let amount = editorEl.querySelector('#amount').value;
+            let editorEl = document.getElementById("insertCsvModal");
+
+            let formData = new FormData();
+            let csvfile =  document.querySelector("#file");
+            formData.append('file', csvfile.files[0]);
 
             //Update on server.
-            axios.post('/transactions/', {label: label, date: date, amount:amount})
+            axios.post('/transactions/bulk', formData)
                 .then(result => {
                     if (result.data == null) {
                         return;
