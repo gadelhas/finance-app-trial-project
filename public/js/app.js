@@ -1983,18 +1983,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return humanDate;
     },
     dailyBalance: function dailyBalance() {
-      var bal = 0.00;
+      var bal = 0;
 
-      for (var i = 0; i < this.entries.length; i++) {
+      for (var i = 0; i < this.transactions.length; i++) {
         bal += parseFloat(this.entries[i].amount);
       }
 
       return bal;
+    },
+    cleanDailyBalance: function cleanDailyBalance() {
+      return this.dailyBalance.toString().replace('-', '');
     }
   },
   methods: {
     changeEntry: function changeEntry(obj) {
       this.entries[obj.idx] = _objectSpread({}, obj.entry);
+    },
+    deleteEntry: function deleteEntry(obj) {
+      console.log("received delete event");
+      delete this.entries[obj.idx];
+      this.$forceUpdate();
     }
   }
 });
@@ -2153,12 +2161,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
         _this.$store.dispatch('getBalance');
       });
-      console.log(this.idx);
       this.$emit('changeEntry', {
         idx: this.idx,
         entry: this.entry
       });
       this.openCloseEditor();
+    },
+    deleteTransaction: function deleteTransaction() {
+      var _this2 = this;
+
+      axios["delete"]('/transactions/' + this.entry.id).then(function (result) {
+        if (result.data == null) {
+          return;
+        }
+
+        _this2.$store.dispatch('getBalance');
+
+        _this2.$emit('deleteEntry', {
+          idx: _this2.idx,
+          entry: _this2.entry
+        });
+      });
     }
   }
 });
@@ -2261,11 +2284,13 @@ __webpack_require__.r(__webpack_exports__);
       axios.post('/transactions/bulk', formData).then(function (result) {
         if (result.data == null) {
           return;
-        }
+        } // NEed to add transaction to list.
 
-        console.log(result); // NEed to add transaction to list.
 
-        _this.$store.dispatch('getBalance');
+        _this.$store.dispatch('getBalance'); // Should add the transactions to the list and avoid reload all page.
+
+
+        window.location.reload();
       });
       console.log(this.idx);
       this.$emit('changeEntry', {
@@ -20759,7 +20784,11 @@ var render = function() {
         ),
         _vm._v(" "),
         _c("span", { staticClass: "text-lg text-gray-500 font-bold" }, [
-          _vm._v("- $" + _vm._s(_vm.dailyBalance))
+          _vm._v(
+            _vm._s(_vm.dailyBalance < 0 ? "-" : "") +
+              " $" +
+              _vm._s(_vm.cleanDailyBalance)
+          )
         ])
       ]),
       _vm._v(" "),
@@ -20771,7 +20800,7 @@ var render = function() {
             _c("Item", {
               key: idx,
               attrs: { idx: idx, transaction: _vm.entries[idx] },
-              on: { changeEntry: _vm.changeEntry }
+              on: { changeEntry: _vm.changeEntry, deleteEntry: _vm.deleteEntry }
             })
           ],
           1
@@ -20829,7 +20858,11 @@ var render = function() {
             [_vm._v("EDIT")]
           ),
           _vm._v(" "),
-          _c("a", { attrs: { href: "#" } }, [_vm._v("DELETE")])
+          _c(
+            "a",
+            { attrs: { href: "#" }, on: { click: _vm.deleteTransaction } },
+            [_vm._v("DELETE")]
+          )
         ]),
         _vm._v(" "),
         _c(

@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div class="text-lg mr-10 rollover-actions">
-                <a href="#" v-on:click="openCloseEditor">EDIT</a> <a href="#">DELETE</a>
+                <a href="#" @click="openCloseEditor">EDIT</a> <a href="#" @click="deleteTransaction">DELETE</a>
             </div>
             <div class="text-lg font-bold" :class="{'text-green-500': isPositive}">
                 {{ entry.amount < 0 ? '-' : '' }} ${{ cleanAmount }}
@@ -133,11 +133,20 @@ export default {
                     this.$store.dispatch('getBalance');
                 });
 
-
-            console.log(this.idx);
             this.$emit('changeEntry', {idx: this.idx, entry: this.entry});
 
             this.openCloseEditor();
+        },
+        deleteTransaction() {
+            axios.delete('/transactions/' + this.entry.id)
+            .then(result => {
+                if (result.data == null) {
+                    return;
+                }
+
+                this.$store.dispatch('getBalance');
+                this.$emit('deleteEntry', {idx: this.idx, entry: this.entry});
+            })
         }
     }
 }

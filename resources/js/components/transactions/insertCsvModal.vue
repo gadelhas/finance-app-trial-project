@@ -90,10 +90,11 @@ export default {
                         return;
                     }
 
-                    console.log(result);
-
                     // NEed to add transaction to list.
                     this.$store.dispatch('getBalance');
+
+                    // Should add the transactions to the list and avoid reload all page.
+                    window.location.reload();
                 });
 
 

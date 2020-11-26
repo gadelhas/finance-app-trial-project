@@ -70,9 +70,23 @@ class TransactionsController extends Controller
         return NULL;
     }
 
+    public function destroy(Transaction $transaction)
+    {
+        if ($transaction->user->id == $this->user->id) {
+
+            $transaction->delete();
+
+            return $transaction;
+        }
+
+        return NULL;
+    }
+
     public function bulk(Request $request)
     {
         $file = $request->file('file');
+
+        // Todo: change this to a job instead of doing it here.
 
         // File Details
         $filename = $file->getClientOriginalName();

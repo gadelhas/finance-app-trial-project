@@ -22,7 +22,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 Route::resource('transactions', \App\Http\Controllers\TransactionsController::class)
-    ->only(['index', 'store', 'update'])
+    ->only(['index', 'store', 'update', 'destroy'])
     ->middleware(['auth']);
 Route::post('transactions/bulk', [\App\Http\Controllers\TransactionsController::class, 'bulk'])
     ->name('transactions.bulk')
