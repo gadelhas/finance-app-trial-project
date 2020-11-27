@@ -31,8 +31,6 @@ class TransactionsController extends Controller
     {
         $transactions = Transaction::where('user_id', $this->user->id)->orderBy('date', 'DESC')->get();
 
-        $balance = $transactions->sum('amount');
-
         $transactions = $transactions->groupBy(function ($item) {
             return Carbon::createFromFormat("Y-m-d H:i:s", $item->date)->format('Y-m-d');
         });
@@ -122,6 +120,16 @@ class TransactionsController extends Controller
                 $this->user->save();
             }
         }
+    }
 
+    public function apiIndex()
+    {
+        $transactions = Transaction::where('user_id', $this->user->id)->orderBy('date', 'DESC')->get();
+
+        $transactions = $transactions->groupBy(function ($item) {
+            return Carbon::createFromFormat("Y-m-d H:i:s", $item->date)->format('Y-m-d');
+        });
+
+        return $transactions;
     }
 }

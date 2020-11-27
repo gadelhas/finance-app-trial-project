@@ -1918,8 +1918,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'Balance',
   computed: {
+    isPositive: function isPositive() {
+      return this.balance > 0;
+    },
     balance: function balance() {
       return this.$store.state.balance;
+    },
+    cleanBalance: function cleanBalance() {
+      return this.balance.toString().replace('-', '');
     }
   }
 });
@@ -1979,7 +1985,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var bal = 0;
 
       for (var i = 0; i < this.transactions.length; i++) {
-        bal += parseFloat(this.entries[i].amount);
+        bal += parseFloat(this.transactions[i].amount);
       }
 
       return (Math.round(bal * 100) / 100).toFixed(2);
@@ -1991,12 +1997,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   methods: {
     changeEntry: function changeEntry(obj) {
-      this.entries[obj.idx] = _objectSpread({}, obj.entry);
+      this.$store.dispatch('getTransactions');
     },
     deleteEntry: function deleteEntry(obj) {
       console.log("received delete event");
-      delete this.entries[obj.idx];
-      this.$forceUpdate();
     }
   }
 });
@@ -2172,6 +2176,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
         _this2.$store.dispatch('getBalance');
 
+        _this2.$store.dispatch('getTransactions');
+
         _this2.$emit('deleteEntry', {
           idx: _this2.idx,
           entry: _this2.entry
@@ -2306,6 +2312,25 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2404,9 +2429,12 @@ __webpack_require__.r(__webpack_exports__);
       e.preventDefault();
       console.log("updateTransaction");
       var editorEl = document.getElementById("insertModal");
-      var label = editorEl.querySelector('#label').value;
-      var date = editorEl.querySelector('#date').value;
-      var amount = editorEl.querySelector('#amount').value; //Update on server.
+      var labelEl = editorEl.querySelector('#label');
+      var label = labelEl.value;
+      var dateEl = editorEl.querySelector('#date');
+      var date = dateEl.value;
+      var amountEl = editorEl.querySelector('#amount');
+      var amount = amountEl.value; //Update on server.
 
       axios.post('/transactions/', {
         label: label,
@@ -2414,19 +2442,35 @@ __webpack_require__.r(__webpack_exports__);
         amount: amount
       }).then(function (result) {
         if (result.data == null) {
+          console.log(result.data);
           return;
-        }
+        } // NEed to add transaction to list.
 
-        console.log(result); // NEed to add transaction to list.
 
         _this.$store.dispatch('getBalance');
+
+        _this.$emit('changeEntry', {
+          idx: _this.idx,
+          entry: _this.entry
+        });
+
+        _this.$store.dispatch('getTransactions');
+
+        _this.close();
+      })["catch"](function (err) {
+        console.log("ERROR");
+
+        if (err.response.status === 422) {
+          Object.entries(err.response.data.errors).forEach(function (_ref) {
+            var _ref2 = _slicedToArray(_ref, 2),
+                key = _ref2[0],
+                value = _ref2[1];
+
+            editorEl.querySelector("#" + key).classList.add('border-red-500');
+          });
+        }
       });
       console.log(this.idx);
-      this.$emit('changeEntry', {
-        idx: this.idx,
-        entry: this.entry
-      });
-      this.close();
     }
   }
 });
@@ -20734,9 +20778,14 @@ var render = function() {
     },
     [
       _vm._v("\n    Total Balance\n    "),
-      _c("span", { staticClass: "block text-3xl font-normal text-green-500" }, [
-        _vm._v("$" + _vm._s(_vm.balance))
-      ])
+      _c(
+        "span",
+        {
+          staticClass: "block text-3xl font-normal",
+          class: { "text-green-500": _vm.isPositive }
+        },
+        [_vm._v("$" + _vm._s(_vm.cleanBalance))]
+      )
     ]
   )
 }
@@ -20785,14 +20834,14 @@ var render = function() {
         ])
       ]),
       _vm._v(" "),
-      _vm._l(_vm.entries, function(transaction, idx) {
+      _vm._l(_vm.transactions, function(transaction, idx) {
         return _c(
           "div",
           { attrs: { id: transaction.id } },
           [
             _c("Item", {
               key: idx,
-              attrs: { idx: idx, transaction: _vm.entries[idx] },
+              attrs: { idx: idx, transaction: _vm.transactions[idx] },
               on: { changeEntry: _vm.changeEntry, deleteEntry: _vm.deleteEntry }
             })
           ],
@@ -21213,7 +21262,7 @@ var render = function() {
             "div",
             {
               staticClass:
-                "inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full",
+                "inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full",
               attrs: {
                 role: "dialog",
                 "aria-modal": "true",
@@ -21336,7 +21385,7 @@ var staticRenderFns = [
                     _vm._v(" "),
                     _c("input", {
                       staticClass: "form-input rounded-md shadow-sm w-full",
-                      attrs: { type: "text", id: "date", name: "date" }
+                      attrs: { type: "date", id: "date", name: "date" }
                     })
                   ]),
                   _vm._v(" "),
@@ -34871,6 +34920,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
   store: _store__WEBPACK_IMPORTED_MODULE_1__["default"],
   created: function created() {
     _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch('getBalance');
+    _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch('getTransactions');
   },
   data: function data() {
     return {
@@ -34899,6 +34949,11 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
       document.getElementById('insertCsvModalButton').disabled = true; // show message
 
       document.getElementById('jobRunning-message').classList.remove('hidden');
+    }
+  },
+  computed: {
+    transactions: function transactions() {
+      return this.$store.state.transactions;
     }
   }
 });
@@ -35320,17 +35375,23 @@ __webpack_require__.r(__webpack_exports__);
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__["default"]);
 /* harmony default export */ __webpack_exports__["default"] = (new vuex__WEBPACK_IMPORTED_MODULE_1__["default"].Store({
   state: {
-    balance: 0
+    balance: 0,
+    transactions: {}
   },
   getters: {
     balance: function balance(state) {
       return state.balance;
+    },
+    transactions: function transactions(state) {
+      return state.transactions;
     }
   },
   mutations: {
     setBalance: function setBalance(state, balance) {
       state.balance = (Math.round(balance * 100) / 100).toFixed(2);
-      ;
+    },
+    setTransactions: function setTransactions(state, transactions) {
+      state.transactions = transactions;
     }
   },
   actions: {
@@ -35339,6 +35400,17 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
       return new Promise(function (resolve, reject) {
         axios.get('/balance').then(function (result) {
           commit('setBalance', result.data);
+          resolve();
+        })["catch"](function (error) {
+          reject(error.response && error.response.data.message || 'Error.');
+        });
+      });
+    },
+    getTransactions: function getTransactions(_ref2) {
+      var commit = _ref2.commit;
+      return new Promise(function (resolve, reject) {
+        axios.get('/transactions/all').then(function (result) {
+          commit('setTransactions', result.data);
           resolve();
         })["catch"](function (error) {
           reject(error.response && error.response.data.message || 'Error.');

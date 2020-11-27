@@ -20,6 +20,7 @@ const app = new Vue({
     store,
     created() {
         store.dispatch('getBalance');
+        store.dispatch('getTransactions');
     },
     data() {
         return {
@@ -50,6 +51,12 @@ const app = new Vue({
             document.getElementById('jobRunning-message').classList.remove('hidden');
         }
     },
+
+    computed: {
+        transactions() {
+            return this.$store.state.transactions;
+        }
+    }
 
 });
 

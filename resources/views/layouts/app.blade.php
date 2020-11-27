@@ -66,9 +66,12 @@
         <div id="jobRunning-message" class="p-6 m-10 full-w mx-auto border-gray-100 bg-orange-400 text-white text-bold rounded text-center {{ Auth::user()->jobRunning ? '' : 'hidden' }}">
             We're importing the balance entries. Sit tight.
         </div>
-        @foreach($transactions as $date => $transaction)
+        <div class="group-dates" v-for="(transaction, date) in transactions" :key="date" :id="date">
+            <Group :date="date" :transactions="transaction"></Group>
+        </div>
+        {{--@foreach($transactions as $date => $transaction)
             <Group date="{{ $date }}" :transactions="{{ json_encode($transaction) }}"></Group>
-        @endforeach
+        @endforeach --}}
     </div>
 
     <insert-modal v-show="isInsertModalVisible" @close="closeInsertModal" ref="insertModal"></insert-modal>

@@ -146,6 +146,7 @@ export default {
                 }
 
                 this.$store.dispatch('getBalance');
+                this.$store.dispatch('getTransactions');
                 this.$emit('deleteEntry', {idx: this.idx, entry: this.entry});
             })
         }

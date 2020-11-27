@@ -5,8 +5,8 @@
             <span class="text-lg text-gray-500 font-bold">{{ dailyBalance < 0 ? '-' : ''}} ${{ cleanDailyBalance }}</span>
         </div>
 
-        <div v-for="(transaction, idx) in entries" :id="transaction.id">
-            <Item :key="idx" :idx="idx" :transaction="entries[idx]" @changeEntry="changeEntry" @deleteEntry="deleteEntry"></Item>
+        <div v-for="(transaction, idx) in transactions" :id="transaction.id">
+            <Item :key="idx" :idx="idx" :transaction="transactions[idx]" @changeEntry="changeEntry" @deleteEntry="deleteEntry"></Item>
         </div>
     </div>
 </template>
@@ -39,7 +39,7 @@ export default {
         dailyBalance() {
             let bal = 0;
             for (let i = 0; i < this.transactions.length; i++) {
-                bal += parseFloat(this.entries[i].amount);
+                bal += parseFloat(this.transactions[i].amount);
             }
 
             return (Math.round(bal * 100) / 100).toFixed(2);;
@@ -50,13 +50,10 @@ export default {
     },
     methods: {
         changeEntry(obj) {
-            this.entries[obj.idx] = {...obj.entry};
+            this.$store.dispatch('getTransactions');
         },
         deleteEntry(obj) {
             console.log("received delete event");
-            delete this.entries[obj.idx];
-
-            this.$forceUpdate();
         }
     }
 }

@@ -28,9 +28,15 @@ Route::get('/dashboard', function () {
 Route::resource('transactions', \App\Http\Controllers\TransactionsController::class)
     ->only(['index', 'store', 'update', 'destroy'])
     ->middleware(['auth']);
+
+Route::get('transactions/all', [\App\Http\Controllers\TransactionsController::class, 'apiIndex'])
+    ->name('transactions.apiIndex')
+    ->middleware('auth');
+
 Route::post('transactions/bulk', [\App\Http\Controllers\TransactionsController::class, 'bulk'])
     ->name('transactions.bulk')
     ->middleware('auth');
+
 Route::get('balance', [\App\Http\Controllers\BalanceController::class, 'index'])
     ->name('balance.index')
     ->middleware(['auth']);
