@@ -12,7 +12,7 @@ export default new Vuex.Store({
     },
     mutations: {
         setBalance(state, balance) {
-            state.balance = balance;
+            state.balance = (Math.round(balance * 100) / 100).toFixed(2);;
         },
     },
     actions: {

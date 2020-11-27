@@ -41,6 +41,13 @@ const app = new Vue({
         },
         closeInsertCsvModal() {
             this.isInsertCsvModalVisible = false;
+        },
+        importCsv() {
+            // disable buttons
+            document.getElementById('insertModalButton').disabled = true;
+            document.getElementById('insertCsvModalButton').disabled = true;
+            // show message
+            document.getElementById('jobRunning-message').classList.remove('hidden');
         }
     },
 

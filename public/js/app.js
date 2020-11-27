@@ -1917,13 +1917,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'Balance',
-  mounted: function mounted() {
-    console.log('Component mounted.');
-
-    if (localStorage.balance) {
-      this.balance = localStorage.balance;
-    }
-  },
   computed: {
     balance: function balance() {
       return this.$store.state.balance;
@@ -1989,7 +1982,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         bal += parseFloat(this.entries[i].amount);
       }
 
-      return bal;
+      return (Math.round(bal * 100) / 100).toFixed(2);
+      ;
     },
     cleanDailyBalance: function cleanDailyBalance() {
       return this.dailyBalance.toString().replace('-', '');
@@ -2121,7 +2115,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return "transaction-editor-" + this.entry.id;
     },
     cleanAmount: function cleanAmount() {
-      return this.entry.amount.toString().replace('-', '');
+      var amount = (Math.round(this.entry.amount * 100) / 100).toFixed(2);
+      return amount.toString().replace('-', '');
     }
   },
   methods: {
@@ -2285,12 +2280,10 @@ __webpack_require__.r(__webpack_exports__);
         if (result.data == null) {
           return;
         } // NEed to add transaction to list.
+        //this.$store.dispatch('getBalance');
 
 
-        _this.$store.dispatch('getBalance'); // Should add the transactions to the list and avoid reload all page.
-
-
-        window.location.reload();
+        _this.$emit('import');
       });
       console.log(this.idx);
       this.$emit('changeEntry', {
@@ -34899,6 +34892,13 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
     },
     closeInsertCsvModal: function closeInsertCsvModal() {
       this.isInsertCsvModalVisible = false;
+    },
+    importCsv: function importCsv() {
+      // disable buttons
+      document.getElementById('insertModalButton').disabled = true;
+      document.getElementById('insertCsvModalButton').disabled = true; // show message
+
+      document.getElementById('jobRunning-message').classList.remove('hidden');
     }
   }
 });
@@ -35329,7 +35329,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
   },
   mutations: {
     setBalance: function setBalance(state, balance) {
-      state.balance = balance;
+      state.balance = (Math.round(balance * 100) / 100).toFixed(2);
+      ;
     }
   },
   actions: {

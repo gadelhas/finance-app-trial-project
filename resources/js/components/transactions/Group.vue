@@ -42,7 +42,7 @@ export default {
                 bal += parseFloat(this.entries[i].amount);
             }
 
-            return bal;
+            return (Math.round(bal * 100) / 100).toFixed(2);;
         },
         cleanDailyBalance() {
             return this.dailyBalance.toString().replace('-', '');

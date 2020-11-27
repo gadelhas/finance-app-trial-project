@@ -17,6 +17,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/home', function () {
+    return redirect()->route('transactions.index');
+})->middleware(['auth'])->name('home');
+
 Route::get('/dashboard', function () {
     return redirect()->route('transactions.index');
 })->middleware(['auth'])->name('dashboard');

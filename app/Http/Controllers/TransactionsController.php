@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\TransactionImporter;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class TransactionsController extends Controller
 {
@@ -86,14 +88,10 @@ class TransactionsController extends Controller
     {
         $file = $request->file('file');
 
-        // Todo: change this to a job instead of doing it here.
-
         // File Details
         $filename = $file->getClientOriginalName();
         $extension = $file->getClientOriginalExtension();
-        $tempPath = $file->getRealPath();
         $fileSize = $file->getSize();
-        $mimeType = $file->getMimeType();
 
         // Valid File Extensions
         $valid_extension = array("csv");
@@ -113,44 +111,15 @@ class TransactionsController extends Controller
                 // Upload file
                 $file->move($location, $filename);
 
-                // Import CSV to Database
-                $filepath = public_path($location . "/" . $filename);
+                // Save CSV in disk
+                $filename = public_path($location . "/" . $filename);
 
-                // Reading file
-                $file = fopen($filepath, "r");
+                TransactionImporter::dispatch($this->user, $filename);
 
-                $importData_arr = [];
-                $i = 0;
-
-                while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE):
-                    $num = count($filedata);
-
-                    // Skip first row
-                    if($i == 0){
-                       $i++;
-                       continue;
-                    }
-                    for ($c=0; $c < $num; $c++) {
-                        $importData_arr[$i][] = $filedata [$c];
-                    }
-                    $i++;
-                endwhile;
-
-                fclose($file);
-
-                DB::beginTransaction();
-
-                foreach($importData_arr as $importData) {
-                    $this->user->transactions()->create([
-                        'label' => $importData[0],
-                        'amount' => $importData[1],
-                        'date' => $importData[2],
-                    ]);
-                }
-
-                DB::commit();
-
-                return response()->json(["message" => 'Imported ' . $i . ' transactions']);
+                // set an user flag, to know that a job is running.
+                // so we can disable buttons and show message
+                $this->user->jobRunning = true;
+                $this->user->save();
             }
         }
 

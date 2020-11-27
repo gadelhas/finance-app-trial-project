@@ -97,7 +97,8 @@ export default {
             return "transaction-editor-" + this.entry.id;
         },
         cleanAmount() {
-            return this.entry.amount.toString().replace('-', '');
+            let amount = (Math.round(this.entry.amount * 100) / 100).toFixed(2);
+            return amount.toString().replace('-', '');
         }
     },
     methods: {

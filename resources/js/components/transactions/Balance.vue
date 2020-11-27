@@ -8,12 +8,6 @@
 <script>
 export default {
     name: 'Balance',
-    mounted() {
-        console.log('Component mounted.')
-        if (localStorage.balance) {
-            this.balance = localStorage.balance;
-        }
-    },
     computed: {
         balance() {
             return this.$store.state.balance;

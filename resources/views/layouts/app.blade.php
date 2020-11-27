@@ -46,14 +46,16 @@
                 </h1>
 
                 <div class="flex flex-row">
-                    <a href="#"
-                       class="flex items-center mr-4 px-3 py-2 bg-blue-700 rounded-md text-white text-xs font-bold uppercase tracking-tight" @click="showInsertModal">
+                    <button id="insertModalButton"
+                        class="flex items-center mr-4 px-3 py-2 bg-blue-700 rounded-md text-white text-xs font-bold uppercase tracking-tight disabled:opacity-50"
+                        @click="showInsertModal" {{ Auth::user()->jobRunning == true ? 'disabled' : '' }}>
                         Add Entry
-                    </a>
-                    <a href="#"
-                       class="flex items-center mr-4 px-3 py-2 bg-blue-700 rounded-md text-white text-xs font-bold uppercase tracking-tight" @click="showInsertCsvModal">
+                    </button>
+                    <button id="insertCsvModalButton"
+                        class="flex items-center mr-4 px-3 py-2 bg-blue-700 rounded-md text-white text-xs font-bold uppercase tracking-tight disabled:opacity-50"
+                        @click="showInsertCsvModal" {{ Auth::user()->jobRunning == true ? 'disabled' : '' }}>
                         Import CSV
-                    </a>
+                    </button>
                 </div>
             </div>
             <Balance :balance="this.balance"></Balance>
@@ -61,14 +63,17 @@
     </div>
 
     <div class="container mx-auto px-8">
-
+        <div id="jobRunning-message" class="p-6 m-10 full-w mx-auto border-gray-100 bg-orange-400 text-white text-bold rounded text-center {{ Auth::user()->jobRunning ? '' : 'hidden' }}">
+            We're importing the balance entries. Sit tight.
+        </div>
         @foreach($transactions as $date => $transaction)
             <Group date="{{ $date }}" :transactions="{{ json_encode($transaction) }}"></Group>
         @endforeach
     </div>
 
     <insert-modal v-show="isInsertModalVisible" @close="closeInsertModal" ref="insertModal"></insert-modal>
-    <insert-csv-modal v-show="isInsertCsvModalVisible" @close="closeInsertCsvModal" ref="insertCsvModal"></insert-csv-modal>
+    <insert-csv-modal v-show="isInsertCsvModalVisible" @close="closeInsertCsvModal" @import="importCsv"
+                      ref="insertCsvModal"></insert-csv-modal>
 </div>
 
 
