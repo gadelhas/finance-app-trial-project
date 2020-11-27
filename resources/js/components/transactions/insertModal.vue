@@ -130,7 +130,19 @@ export default {
                     console.log("ERROR");
                     if (err.response.status === 422) {
                         Object.entries(err.response.data.errors).forEach(([key, value]) => {
-                            editorEl.querySelector("#"+key).classList.add('border-red-500');
+                            let el = editorEl.querySelector("#" + key);
+                            el.classList.add('border-red-500');
+                            let errorEl = document.createElement("div");
+                            errorEl.classList.add("flex");
+                            errorEl.classList.add("items-center");
+                            errorEl.classList.add("font-medium");
+                            errorEl.classList.add("tracking-wide");
+                            errorEl.classList.add("text-red-500");
+                            errorEl.classList.add("text-xs");
+                            errorEl.classList.add("mt-1");
+                            errorEl.classList.add("ml-1");
+                            errorEl.innerHTML = value;
+                            el.parentNode.insertBefore(errorEl, el.nextSibling);
                         });
                     }
                 });
