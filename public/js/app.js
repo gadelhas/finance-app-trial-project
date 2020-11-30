@@ -2317,7 +2317,6 @@ __webpack_require__.r(__webpack_exports__);
 
       e.preventDefault();
       console.log("updateTransaction");
-      var editorEl = document.getElementById("insertCsvModal");
       var formData = new FormData();
       var csvfile = document.querySelector("#file");
       formData.append('file', csvfile.files[0]); //Update on server.
@@ -2467,8 +2466,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       var _this = this;
 
       e.preventDefault();
-      console.log("updateTransaction");
-      var editorEl = document.getElementById("insertModal");
+      console.log("updateTransaction"); //let editorEl = document.getElementById("insertModal");
+
+      var editorEl = this.$refs['insertModal'];
       var labelEl = editorEl.querySelector('#label');
       var label = labelEl.value;
       var dateEl = editorEl.querySelector('#date');
@@ -21120,6 +21120,7 @@ var render = function() {
   return _c(
     "div",
     {
+      ref: "insertCsvModal",
       staticClass: "fixed z-10 inset-0 overflow-y-auto insertCsvModal",
       attrs: { id: "insertCsvModal" }
     },
@@ -21288,6 +21289,7 @@ var render = function() {
   return _c(
     "div",
     {
+      ref: "insertModal",
       staticClass: "fixed z-10 inset-0 overflow-y-auto insertModal",
       attrs: { id: "insertModal" }
     },

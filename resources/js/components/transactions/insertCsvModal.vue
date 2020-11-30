@@ -1,6 +1,6 @@
 <template>
     <!-- This example requires Tailwind CSS v2.0+ -->
-    <div class="fixed z-10 inset-0 overflow-y-auto insertCsvModal" id="insertCsvModal">
+    <div class="fixed z-10 inset-0 overflow-y-auto insertCsvModal" id="insertCsvModal" ref="insertCsvModal">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <!--
               Background overlay, show/hide based on modal state.
@@ -77,7 +77,6 @@ export default {
             e.preventDefault();
 
             console.log("updateTransaction");
-            let editorEl = document.getElementById("insertCsvModal");
 
             let formData = new FormData();
             let csvfile =  document.querySelector("#file");
