@@ -12,24 +12,18 @@ use Illuminate\Support\Facades\Session;
 
 class TransactionsController extends Controller
 {
-    protected $user;
-
     public function __construct()
     {
         // Could add middleware here, but adding instead on web.php for code cleanliness.
 
         // Middleware : Auth
-
-        $this->middleware(function ($request, $next) {
-            $this->user = Auth::user();
-
-            return $next($request);
-        });
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = Transaction::where('user_id', $this->user->id)->orderBy('date', 'DESC')->get();
+        $user = $request->user();
+
+        $transactions = $user->transactions()->orderBy('date', 'DESC')->get();
 
         $transactions = $transactions->groupBy(function ($item) {
             return Carbon::createFromFormat("Y-m-d H:i:s", $item->date)->format('Y-m-d');
@@ -46,7 +40,7 @@ class TransactionsController extends Controller
             'date' => 'required',
         ]);
 
-        $user = $this->user;
+        $user = $request->user();
 
         $transaction = $user->transactions()->create($validatedData);
 
@@ -55,7 +49,7 @@ class TransactionsController extends Controller
 
     public function update(Transaction $transaction, Request $request)
     {
-        if ($transaction->user->id == $this->user->id) {
+        if ($transaction->user->id == $request->user()->id) {
             $validatedData = $request->validate([
                 'label' => 'required',
                 'amount' => 'required',
@@ -70,9 +64,9 @@ class TransactionsController extends Controller
         return NULL;
     }
 
-    public function destroy(Transaction $transaction)
+    public function destroy(Request $request, Transaction $transaction)
     {
-        if ($transaction->user->id == $this->user->id) {
+        if ($transaction->user->id == $request->user()->id) {
 
             $transaction->delete();
 
@@ -122,9 +116,10 @@ class TransactionsController extends Controller
         }
     }
 
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
-        $transactions = Transaction::where('user_id', $this->user->id)->orderBy('date', 'DESC')->get();
+        $user = $request->user();
+        $transactions = $user->transactions()->orderBy('date', 'DESC')->get();
 
         $transactions = $transactions->groupBy(function ($item) {
             return Carbon::createFromFormat("Y-m-d H:i:s", $item->date)->format('Y-m-d');
